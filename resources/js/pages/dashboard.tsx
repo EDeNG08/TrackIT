@@ -34,4 +34,4 @@ Dashboard.layout = {
             href: dashboard(),
         },
     ],
-};
+}
