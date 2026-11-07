@@ -1,0 +1,114 @@
+Table Categorias {
+  id int [pk, increment]
+  nombre varchar(150) [not null]
+  descripcion text
+  tipo varchar(50) [not null, default: 'activo_fijo'] // 'activo_fijo', 'consumible', 'servicio'
+} // CREADA
+
+Table Proveedores {
+  id int [pk, increment]
+  rif varchar(20) [unique]
+  nombre_empresa varchar(255) [not null]
+  nombre_contacto varchar(100)
+  telefono varchar(100)
+  email varchar(255)
+  direccion text
+} // CREADA
+
+Table Departamentos {
+  id int [pk, increment]
+  nombre varchar(100) [not null]
+  descripcion text
+  codigo_area varchar(10) [not null]
+  responsable_area varchar(100)
+  estado_area boolean [default: true] // true: activo, false: inactivo
+} // CREADA
+
+Table Equipos {
+  id int [pk, increment]
+  categoria_id int [ref: > Categorias.id]
+  nombre varchar(150) [not null]
+  codigo varchar(50) [not null]
+  marca varchar(100)
+  modelo varchar(100)
+  especificaciones text
+  codigo_barras varchar(100)
+  garantia_dias int [default: 0]
+  maneja_serial boolean [default: true]
+} // CREADA
+
+Table Lotes {
+  id int [pk, increment]
+  equipo_id int [ref: > Equipos.id]
+  proveedor_id int [ref: > Proveedores.id]
+  codigo_lote varchar(50) [not null]
+  fecha_entrada date
+  cantidad_inicial int [not null]
+  cantidad_actual int [not null]
+  costo_unitario decimal(10, 2)
+  observaciones text
+} // CREADA
+
+Table Activos {
+  id int [pk, increment]
+  equipo_id int [ref: > Equipos.id]
+  lote_id int [ref: > Lotes.id]
+  numero_serie varchar(100) [unique]
+  placa_inventario varchar(100) [unique]
+  estado varchar(50) [not null, default: 'Disponible'] // 'Disponible', 'En Uso', 'Mantenimiento', 'Baja'
+} // CREADA
+
+Table Empleados {
+  id int [pk, increment]
+  departamento_id int [ref: > Departamentos.id]
+  nombre varchar(100) [not null]
+  cargo varchar(100)
+  email varchar(100)
+  telefono varchar(20)
+} // CREADA
+
+Table Asignaciones {
+  id int [pk, increment]
+  activo_id int [ref: > Activos.id]
+  empleado_id int [ref: > Empleados.id]
+  fecha_asignacion date [not null]
+  fecha_devolucion date
+  motivo varchar(255)
+} // CREADA
+
+Table Consumibles {
+  id int [pk, increment]
+  categoria_id int [ref: > Categorias.id]
+  nombre varchar(150) [not null]
+  codigo varchar(50) [not null] // Código interno o SKU del consumible
+  marca varchar(100)
+  modelo varchar(100)
+  codigo_barras varchar(100)
+  descripcion text
+  stock_actual int [default: 0]
+  stock_minimo int [default: 0]
+  stock_maximo int
+} // CREADA
+
+Table Mantenimientos {
+  id int [pk, increment]
+  activo_id int [ref: > Activos.id]
+  tipo varchar(50) [not null] // 'preventivo', 'correctivo'
+  descripcion text [not null]
+  costo decimal(10, 2) [default: 0]
+  fecha_inicio date [not null]
+  fecha_fin date
+  estado varchar(20) [default: 'en_proceso']
+} // CREADA
+
+Table MovimientosInventario {
+  id int [pk, increment]
+  consumible_id int [ref: > Consumibles.id, null]
+  activo_id int [ref: > Activos.id, null]
+  departamento_origen_id int [ref: > Departamentos.id, null]
+  empleado_origen_id int [ref: > Empleados.id, null]
+  departamento_destino_id int [ref: > Departamentos.id, null]
+  empleado_destino_id int [ref: > Empleados.id, null]
+  tipo_movimiento varchar(50) [not null] // 'entrada', 'salida', 'traslado', 'baja'
+  observaciones text
+} // CREADA
